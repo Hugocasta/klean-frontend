@@ -12,13 +12,17 @@ function Nav(props) {
 
   useEffect(() => {
 
+    //Fonction qui permet de récupérer les IDs des cleanwalk de l'utilisateur pour dynamiser la page détail
     const loadCws = async (token) => {
       let rawResponse = await fetch(`${PROXY}/load-cw-forstore/${token}`);
       let response = await rawResponse.json();
       props.loadCwsStore({ infosCWparticipate: response.infosCWparticipate, infosCWorganize: response.infosCWorganize });
     }
 
+    //Suppression du token lors de reset de la base de données (développement)
     //AsyncStorage.removeItem("token");
+
+    //Récupération du token enregistré en local storage
     AsyncStorage.getItem('token', (err, value) => {
       if (value) {
         const valueParse = JSON.parse(value);
@@ -33,6 +37,7 @@ function Nav(props) {
   
   return (
     <NavigationContainer>
+      {/*Affiche la stack invité s'il s'agit du token invité (par défaut), sinon affiche la stack des utilisateurs connecté*/}
       {props.tokenObj.token === "XeDLDMr3U4HSJSl74HJpKD" ? <InvitedFlow /> : <ConnectedFlow /> }
     </NavigationContainer>
   )

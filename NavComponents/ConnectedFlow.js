@@ -72,14 +72,14 @@ export default function ConnectedFlow() {
 
 
 
-
-/* STACKS FOR EACH MAIN TAB*/
+//Création des stacks pour les tab screen Map, CreateEvent et Profil
 
 function ConnectedMapStack() {
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  //Suppression de l'historique de navigation lorsque le focus est récupéré sur la stack.
   useEffect(() => {
     function back() {
       navigation.reset({
@@ -126,9 +126,7 @@ function ConnectedMapStack() {
 
     if (isFocused) {
       back();
-    } else {
-      null
-    }
+    } 
   }, [isFocused]);
 
   return (
@@ -147,6 +145,7 @@ function CreateEventStack() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  //Suppression de l'historique de navigation lorsque le focus est récupéré sur la stack.
   useEffect(() => {
     function back() {
       navigation.reset({
@@ -193,8 +192,6 @@ function CreateEventStack() {
 
     if (isFocused) {
       back();
-    } else {
-      null
     }
   }, [isFocused]);
 
@@ -213,6 +210,7 @@ function ProfilStack() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  //Suppression de l'historique de navigation lorsque le focus est récupéré sur la stack.
   useEffect(() => {
     function back() {
       navigation.reset({
@@ -259,8 +257,6 @@ function ProfilStack() {
 
     if (isFocused) {
       back();
-    } else {
-      null
     }
   }, [isFocused]);
 
