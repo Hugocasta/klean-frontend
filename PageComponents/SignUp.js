@@ -105,7 +105,7 @@ function SignUp(props) {
   });
 
   function backArrow() {
-    props.navigation.navigate("InvitedEventDetail");
+    props.navigation.navigate("InvitedMapScreen");
   }
 
   let button;
@@ -246,7 +246,7 @@ function mapStateToProps(state) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    height: screenDimensions.height,
+    height: windowDimensions.height,
     alignItems: "center",
     backgroundColor: colors.white,
   },
