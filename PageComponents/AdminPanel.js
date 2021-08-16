@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, View, Button } from 'react-native';
 import { connect } from 'react-redux';
 
+/* Composant utilisé uniquement en phase de développement pour pouvoir accéder aux différents 
+flow de navigation plus rapidement */
 
 function AdminPanel(props) {
 

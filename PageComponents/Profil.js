@@ -49,20 +49,24 @@ function Profil(props) {
   const [statCity, setStatCity] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
     const loadProfil = async () => {
       let rawResponse = await fetch(
         `${PROXY}/load-profil/${props.tokenObj.token}`
       );
       let response = await rawResponse.json();
       if (response.result) {
+        if (mounted) {
         setListCWparticipate(response.infosCWparticipate);
         setListCWorganize(response.infosCWorganize);
         setInfosUser(response.infosUser);
         setStatPerso(response.statPerso);
         setStatCity(response.statCity);
       }
+      }
     };
     loadProfil();
+    return () => mounted = false
   }, [props.cwsStore]);
 
   useEffect(() => {
@@ -138,7 +142,7 @@ function Profil(props) {
     cwListOrganize = (
       <View style={styles.ctTextNoCw}>
         <Text style={styles.textNoCw}>
-        {"Vous n'organisez pas encore de cleanwalks :\("}
+          {"Vous n'organisez pas encore de cleanwalks :\("}
         </Text>
       </View>
     );
@@ -148,7 +152,7 @@ function Profil(props) {
     cwListParticipate === null ||
     cwListOrganize === null ||
     statPerso === null ||
-    statCity === null 
+    statCity === null
   ) {
     return (
       <View style={styles.wait}>
@@ -159,13 +163,13 @@ function Profil(props) {
     return (
       <View style={styles.container}>
         <SafeAreaView style={styles.header}>
-        
+
           <View style={styles.dull}></View>
           <Text style={styles.mainTitle}> MON PROFIL </Text>
           <View style={styles.logout}>
             <ButtonElement
               typeButton="logout"
-              onPress={ () => signoutAppli() }
+              onPress={() => signoutAppli()}
             />
           </View>
         </SafeAreaView>
@@ -234,8 +238,8 @@ function Profil(props) {
                     statPerso < 20
                       ? badge.bumblebin.img
                       : statPerso < 50
-                      ? badge.optimusklean.img
-                      : badge.trashexterminator.img
+                        ? badge.optimusklean.img
+                        : badge.trashexterminator.img
                   }
                 />
                 <View style={styles.statBody}>
@@ -243,8 +247,8 @@ function Profil(props) {
                     {statPerso < 20
                       ? badge.bumblebin.name
                       : statPerso < 50
-                      ? badge.optimusklean.name
-                      : badge.trashexterminator.name}
+                        ? badge.optimusklean.name
+                        : badge.trashexterminator.name}
                   </Text>
                   <Text style={styles.statBodyText}>
                     {statPerso} Cleanwalks réalisées
@@ -292,11 +296,11 @@ function Profil(props) {
           />
           <View style={styles.infoPerso}>
 
-          <Image
-            style={styles.avatar}
-            source={{uri: infosUser.avatarUrl}}
-            
-          />
+            <Image
+              style={styles.avatar}
+              source={{ uri: infosUser.avatarUrl }}
+
+            />
             <View style={styles.statBody}>
               <Text style={styles.statBodyTitle}>{infosUser.firstName}</Text>
               <Text style={styles.statBodyText}>{infosUser.lastName}</Text>
@@ -312,30 +316,31 @@ function Profil(props) {
 
                 onPress={async () => {
                   let image = await pickImage();
-                  
+
                   if (image) {
-                  var data = new FormData();
-                  data.append('avatar', {
-                    uri: image,
-                    type: 'image/jpeg',
-                    name: 'avatar.jpg',
-                  });
+                    var data = new FormData();
+                    data.append('avatar', {
+                      uri: image,
+                      type: 'image/jpeg',
+                      name: 'avatar.jpg',
+                    });
 
-                  var rawResponse = await fetch (PROXY + `/upload-photo/${props.tokenObj.token}`, {
-                    method: 'POST',
-                    body: data
-                  });
-              
-                  var response = await rawResponse.json();
+                    var rawResponse = await fetch(PROXY + `/upload-photo/${props.tokenObj.token}`, {
+                      method: 'POST',
+                      body: data
+                    });
 
-                  if(response.result) {
-                  let copy = {...infosUser}
-                  copy.avatarUrl = response.resultCloudinary.secure_url
-                  setInfosUser(copy)
+                    var response = await rawResponse.json();
+
+                    if (response.result) {
+                      let copy = { ...infosUser }
+                      copy.avatarUrl = response.resultCloudinary.secure_url
+                      setInfosUser(copy)
+                    }
+
                   }
+                }}
 
-                }}}
-                
               />
 
             </View>

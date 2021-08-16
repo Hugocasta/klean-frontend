@@ -13,7 +13,7 @@ import AutoComplete from '../lib/AutoComplete';
 import PROXY from '../proxy';
 
 function ConnectedMapScreen(props) {
-  
+
   const [isVisiblePreview, setIsVisiblePreview] = useState(false);
   const [dateSearch, setDateSearch] = useState(new Date());
   const [adress, setAdress] = useState("");
@@ -30,83 +30,81 @@ function ConnectedMapScreen(props) {
 
   const geoLoc = async () => {
     location = await Location.getCurrentPositionAsync({});
-      setCurrentRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+    setCurrentRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
     });
   };
 
   useEffect(() => {
-      async function askPermissions() {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status === 'granted') {
-            geoLoc();
-          }
+    async function askPermissions() {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        geoLoc();
       }
-      askPermissions();
+    }
+    askPermissions();
   }, []);
 
   useEffect(() => {
-      loadCleanwalk(currentRegion, dateSearch);
+    loadCleanwalk(currentRegion, dateSearch);
   }, [dateSearch])
 
   useEffect(() => {
-      async function loadData() {
-          let rawResponse = await fetch(PROXY + '/autocomplete-search', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: `adress=${adress.replace(" ", "+")}&token=${props.tokenObj.token}`
-          });
-          let response = await rawResponse.json();
-          setAutoComplete(response.response)
-      };
-      if (adress.length != null) {
-          loadData()
-      } else {
-
-      };
+    async function loadData() {
+      let rawResponse = await fetch(PROXY + '/autocomplete-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `adress=${adress.replace(" ", "+")}&token=${props.tokenObj.token}`
+      });
+      let response = await rawResponse.json();
+      setAutoComplete(response.response)
+    };
+    if (adress.length != null) {
+      loadData()
+    }
   }, [adress]);
 
   const loadCleanwalk = async (currentRegion, dateSearch) => {
 
-      let rawResponse = await fetch(PROXY + '/load-pin-on-change-region', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `coordinate=${JSON.stringify(currentRegion)}&date=${dateSearch}&token=${props.tokenObj.token}`
-      });
-      let response = await rawResponse.json();
-      setListPositionCW(response.cleanWalkArray);
+    let rawResponse = await fetch(PROXY + '/load-pin-on-change-region', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `coordinate=${JSON.stringify(currentRegion)}&date=${dateSearch}&token=${props.tokenObj.token}`
+    });
+    let response = await rawResponse.json();
+    setListPositionCW(response.cleanWalkArray);
   }
 
   const markers = listPositionCW.map((marker, i) => {
-      return (
-          <Marker 
-              key={i}
-              coordinate={{ latitude: marker.cleanwalkCoordinates.latitude, longitude: marker.cleanwalkCoordinates.longitude }}
-              image={pinSmall}
-              anchor={{ x: 0.5, y: 1 }}
-              centerOffset={{ x: 0.5, y: 1 }}
-              onPress={() => { setPreviewInfo(listPositionCW[i]); setIsVisiblePreview(!isVisiblePreview) }}
-          />
-      )
+    return (
+      <Marker
+        key={i}
+        coordinate={{ latitude: marker.cleanwalkCoordinates.latitude, longitude: marker.cleanwalkCoordinates.longitude }}
+        image={pinSmall}
+        anchor={{ x: 0.5, y: 1 }}
+        centerOffset={{ x: 0.5, y: 1 }}
+        onPress={() => { setPreviewInfo(listPositionCW[i]); setIsVisiblePreview(!isVisiblePreview) }}
+      />
+    )
   });
 
   return (
-    <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.contentSearchBar}>
         <SearchBarElement adress={adress} setAdress={setAdress} onChangeShowAutoComplete={setShowAutoComplete} placeholder="Où ? (adresse)" />
 
         <SearchBarElement
-            type='date'
-            dateSearch={dateSearch}
-            setDateSearch={setDateSearch}
+          type='date'
+          dateSearch={dateSearch}
+          setDateSearch={setDateSearch}
         />
 
       </View>
       <View>
-        {showAutoComplete && <AutoComplete data={autoComplete} onPress={setAdress} setShowAutoComplete={setShowAutoComplete} regionSetter={setCurrentRegion} /> }
+        {showAutoComplete && <AutoComplete data={autoComplete} onPress={setAdress} setShowAutoComplete={setShowAutoComplete} regionSetter={setCurrentRegion} />}
       </View>
       <MapView
         style={styles.container}
@@ -118,32 +116,32 @@ function ConnectedMapScreen(props) {
           longitudeDelta: 0.0421,
         }}
         region={currentRegion}
-        onRegionChangeComplete={ (newRegion) => {
-            setCurrentRegion(newRegion)
-            loadCleanwalk(newRegion, dateSearch)
-          }
+        onRegionChangeComplete={(newRegion) => {
+          setCurrentRegion(newRegion)
+          loadCleanwalk(newRegion, dateSearch)
+        }
         }
       >
         {markers}
-       
+
       </MapView>
       {previewInfo ? (<PreviewEvent
-          title={previewInfo.cleanwalkTitle}
-          desc={previewInfo.cleanwalkDescription}
-          toolBadge={previewInfo.toolBadge}
-          nameOrga={previewInfo.admin.lastName}
-          firstnameOrga={previewInfo.admin.firstName}
-          avatar={previewInfo.admin.avatarUrl}
-          onPress={() => {
-            props.setCwIdMapStack(previewInfo._id);
-            props.navigation.navigate('ConnectedEventDetailMapStack')
-          }}
-          visible={isVisiblePreview}
+        title={previewInfo.cleanwalkTitle}
+        desc={previewInfo.cleanwalkDescription}
+        toolBadge={previewInfo.toolBadge}
+        nameOrga={previewInfo.admin.lastName}
+        firstnameOrga={previewInfo.admin.firstName}
+        avatar={previewInfo.admin.avatarUrl}
+        onPress={() => {
+          props.setCwIdMapStack(previewInfo._id);
+          props.navigation.navigate('ConnectedEventDetailMapStack')
+        }}
+        visible={isVisiblePreview}
       />
-      ):(null)}
-      <ButtonElement 
-        typeButton="geoloc" 
-        onPress={ () => geoLoc() }
+      ) : (null)}
+      <ButtonElement
+        typeButton="geoloc"
+        onPress={() => geoLoc()}
       />
     </SafeAreaView>
 
@@ -160,7 +158,7 @@ function mapDispatchToProps(dispatch) {
     },
     setCwIdMapStack: function (id) {
       dispatch({ type: "setCwIdMapStack", id });
-  },
+    },
   };
 }
 

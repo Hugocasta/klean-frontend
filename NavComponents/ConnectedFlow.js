@@ -92,28 +92,28 @@ function ConnectedMapStack() {
           "Profil",
           "Actualité",
         ],
-        routes:  [
-         {
+        routes: [
+          {
             key: "Chercher-LnoZY_eAc_zltdO06qMeR",
             name: "Chercher",
             params: undefined,
           },
-           {
+          {
             key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
             name: "Classement",
             params: undefined,
           },
-           {
+          {
             key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
             name: "Proposer",
             params: undefined,
           },
-           {
+          {
             key: "Profil-jl_XJIfAXXulX3ykpEn8E",
             name: "Profil",
             params: undefined,
           },
-           {
+          {
             key: "Actualité-agTpC7a_x3lxQN469zmsP",
             name: "Actualité",
             params: undefined,
@@ -122,11 +122,11 @@ function ConnectedMapStack() {
         stale: true,
         type: "tab",
       })
-      };
+    };
 
     if (isFocused) {
       back();
-    } 
+    }
   }, [isFocused]);
 
   return (
@@ -158,28 +158,28 @@ function CreateEventStack() {
           "Profil",
           "Actualité",
         ],
-        routes:  [
-         {
+        routes: [
+          {
             key: "Chercher-LnoZY_eAc_zltdO06qMeR",
             name: "Chercher",
             params: undefined,
           },
-           {
+          {
             key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
             name: "Classement",
             params: undefined,
           },
-           {
+          {
             key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
             name: "Proposer",
             params: undefined,
           },
-           {
+          {
             key: "Profil-jl_XJIfAXXulX3ykpEn8E",
             name: "Profil",
             params: undefined,
           },
-           {
+          {
             key: "Actualité-agTpC7a_x3lxQN469zmsP",
             name: "Actualité",
             params: undefined,
@@ -188,7 +188,7 @@ function CreateEventStack() {
         stale: true,
         type: "tab",
       })
-      };
+    };
 
     if (isFocused) {
       back();
@@ -223,28 +223,28 @@ function ProfilStack() {
           "Profil",
           "Actualité",
         ],
-        routes:  [
-         {
+        routes: [
+          {
             key: "Chercher-LnoZY_eAc_zltdO06qMeR",
             name: "Chercher",
             params: undefined,
           },
-           {
+          {
             key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
             name: "Classement",
             params: undefined,
           },
-           {
+          {
             key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
             name: "Proposer",
             params: undefined,
           },
-           {
+          {
             key: "Profil-jl_XJIfAXXulX3ykpEn8E",
             name: "Profil",
             params: undefined,
           },
-           {
+          {
             key: "Actualité-agTpC7a_x3lxQN469zmsP",
             name: "Actualité",
             params: undefined,
@@ -253,11 +253,11 @@ function ProfilStack() {
         stale: true,
         type: "tab",
       })
-      };
-
+    };
     if (isFocused) {
       back();
     }
+
   }, [isFocused]);
 
   return (
