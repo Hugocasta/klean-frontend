@@ -13,8 +13,8 @@ import { connect } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../lib/colors";
-import { windowDimensions, screenDimensions } from "../lib/windowDimensions";
-import { typography, Typography } from "../lib/typography";
+import { windowDimensions } from "../lib/windowDimensions";
+import { typography } from "../lib/typography";
 import ButtonElement from "../lib/ButtonElement";
 import InputElement from "../lib/InputElement";
 import LogoKlean from "../assets/imagesKlean/LogoKlean.png";
