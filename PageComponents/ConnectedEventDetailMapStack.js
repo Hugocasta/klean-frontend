@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  ImageBackground,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
+    StyleSheet,
+    Text,
+    View,
+    ImageBackground,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
 } from "react-native";
+
 import { connect } from "react-redux";
+
 import ScreenTitles from "../lib/ScreenTitles.js";
 import ButtonElement from "../lib/ButtonElement";
 import Participants from "../lib/Participants";
@@ -17,9 +19,13 @@ import { windowDimensions } from "../lib/windowDimensions.js";
 import { typography } from "../lib/typography.js";
 import { colors } from "../lib/colors.js";
 import changeDateFormat from "../lib/changeDateFormat";
+
 import { showLocation } from 'react-native-map-link';
 
 import PROXY from "../proxy.js";
+
+/* Composant permettant d'afficher la page contenant le détail des cleanwalks sur la stack de navigation
+de la Map */
 
 function ConnectedEventDetailMapStack(props) {
 
@@ -28,6 +34,8 @@ function ConnectedEventDetailMapStack(props) {
     const [cleanwalk, setCleanwalk] = useState(null);
     const [error, setError] = useState(null);
 
+    /* Ajout de l'organisateur au début de la liste des participants (enregistré séparement en base de données)
+    pour envoyer le tableau en props du composant Participants */
     const dataParticipants = (admin, participants) => {
         participants.unshift(admin);
         return participants;
@@ -44,22 +52,26 @@ function ConnectedEventDetailMapStack(props) {
     }, []);
 
     let participate = async () => {
+        /* Mise à jour de la participation de l'utilisateur en BDD */
         let data = await fetch(PROXY + "/subscribe-cw", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `cleanwalkID=${props.cwIdMapStack}&token=${props.tokenObj.token}`,
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `cleanwalkID=${props.cwIdMapStack}&token=${props.tokenObj.token}`,
         });
 
         let body = await data.json();
         if (body.result == true) {
+            /* Ajout de l'ID de la cleanwalk dans le store pour l'affichage dynamique des boutons sur la page
+            pour la participation, la désinscription ou la suppression de la cleanwalk */
             props.addCwsPart(idCW);
             props.navigation.navigate("Profil");
-        } if (body.result == false){
+        } if (body.result == false) {
             setError(body.error)
         }
     };
 
     const unsubscribeCw = async () => {
+        /* Mise à jour de la désinscription de l'utilisateur en BDD */
         let rawResponse = await fetch(`${PROXY}/unsubscribe-cw`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -68,29 +80,36 @@ function ConnectedEventDetailMapStack(props) {
 
         let body = await rawResponse.json();
         if (body.result == true) {
+            /* Suppression de l'ID de la cleanwalk dans le store pour l'affichage dynamique des boutons sur la page
+            pour la participation, la désinscription ou la suppression de la cleanwalk */
             props.desinsCws(idCW);
             props.navigation.navigate("Profil");
-        } if (body.result == false){
+        } if (body.result == false) {
             setError(body.error)
         }
-    
+
     }
 
     const deleteCw = async () => {
+        /* Mise à jour de la suppression de la cleanwalk en BDD */
         let rawResponse = await fetch(`${PROXY}/delete-cw/${props.tokenObj.token}/${idCW}`, {
             method: 'DELETE'
         });
 
         let body = await rawResponse.json();
         if (body.result == true) {
+            /* Suppression de l'ID de la cleanwalk dans le store pour l'affichage dynamique des boutons sur la page
+            pour la participation, la désinscription ou la suppression de la cleanwalk */
             props.supCws(idCW);
             props.navigation.navigate("Profil");
-        } if (body.result == false){
+        } if (body.result == false) {
             setError(body.error)
         }
 
     }
 
+    /* Affichage dynamique du bouton en fin de page (participation, suppression ou désinscription à la cleanwalk)
+    à partir des éléments enregistrés dans le store */
     const checkCwsParticipate = props.cwsStore.infosCWparticipate.findIndex(
         index => index.toString() === idCW.toString()
     );
@@ -99,43 +118,48 @@ function ConnectedEventDetailMapStack(props) {
         index => index.toString() === idCW.toString()
     );
 
+    /* btnActive permet de gérer l'affichage du bouton "s'y rendre", actif uniquement lorsque l'utilisateur
+    participe ou organise la cleanwalk */
     let btnActive = false;
     let confirmButton;
+
     if (checkCwsParticipate !== -1) {
         confirmButton = <View style={styles.confirmButton}>
-                            <ButtonElement
-                                typeButton="middleSecondary"
-                                text="Se désinscrire"
-                                onPress={ () => unsubscribeCw() }
-                            />
-                        </View>;
+            <ButtonElement
+                typeButton="middleSecondary"
+                text="Se désinscrire"
+                onPress={() => unsubscribeCw()}
+            />
+        </View>;
         btnActive = true;
-        
+
     } else if (checkCwsOrganize !== -1) {
         confirmButton = <View style={styles.confirmButton}>
-                            <ButtonElement
-                                typeButton="middleSecondary"
-                                text="Supprimer la cleanwalk"
-                                onPress={ () => deleteCw() }
-                            />
-                        </View>;
+            <ButtonElement
+                typeButton="middleSecondary"
+                text="Supprimer la cleanwalk"
+                onPress={() => deleteCw()}
+            />
+        </View>;
         btnActive = true;
+        
     } else {
         confirmButton = <View style={styles.confirmButton}>
-                            <ButtonElement
-                                typeButton="middleSecondary"
-                                text="Participer"
-                                onPress={ () => participate() }
-                            />
-                        </View>;
+            <ButtonElement
+                typeButton="middleSecondary"
+                text="Participer"
+                onPress={() => participate()}
+            />
+        </View>;
     }
 
     let errors = (
         <View>
-            <Text>{error};</Text>
+            <Text>{error}</Text>
         </View>
     );
 
+    /* Affichage d'un loader tant que la cleanwalk n'a pas été récupérée depuis le backend */
     if (cleanwalk === null) {
         return <View style={{ flex: 1, backgroundColor: colors.white }}></View>;
     } else {
@@ -154,16 +178,18 @@ function ConnectedEventDetailMapStack(props) {
                             typeButton="back"
                             onPress={() => props.navigation.navigate('ConnectedMapScreen')}
                         />
-                        {btnActive ? 
+                        {btnActive ?
                             <ButtonElement
                                 style={styles.goButton}
                                 typeButton="go"
+                                /* Fonction importée depuis le module map-link qui permet d'afficher le point d'intérêt
+                                sur l'application carte native de l'appareil */
                                 onPress={() => showLocation({
                                     latitude: cleanwalk.cleanwalkCoordinates.latitude,
                                     longitude: cleanwalk.cleanwalkCoordinates.longitude,
                                     title: cleanwalk.cleanwalkTitle,
-                                })} 
-                            /> : 
+                                })}
+                            /> :
                             <ButtonElement
                                 style={styles.goButton}
                                 typeButton="go"
@@ -206,6 +232,7 @@ function ConnectedEventDetailMapStack(props) {
 
                     <View style={styles.participantsContainer}>
                         <View style={styles.participantsList}>
+                            {/* L'organisateur doit toujours être situé au début du tableau */}
                             <Participants data={dataParticipants(cleanwalk.admin, cleanwalk.participantsList)} />
                         </View>
 
@@ -227,7 +254,7 @@ function ConnectedEventDetailMapStack(props) {
 
         );
     }
-  
+
 }
 
 function mapDispatchToProps(dispatch) {
@@ -245,69 +272,73 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
-    return { tokenObj: state.tokenObj, cwIdMapStack: state.cwIdMapStack, cwsStore: state.cwsStore };
+    return {
+        tokenObj: state.tokenObj,
+        cwIdMapStack: state.cwIdMapStack,
+        cwsStore: state.cwsStore
+    };
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  banner: {
-    width: windowDimensions.width,
-    height: 100,
-    marginTop: 29,
-    justifyContent: "space-between",
-    paddingLeft: 17,
-    paddingRight: 17,
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  backButton: {
-    position: "absolute",
-    zIndex: 10,
-  },
-  goButton: {
-    position: "absolute",
-    zIndex: 10,
-  },
-  generalInfoCleanwalk: {
-    marginTop: 11,
-    marginBottom: 11,
-    marginLeft: 18,
-  },
-  descriptionCleanwalk: {
-    marginBottom: 11,
-    marginLeft: 18,
-  },
-  cleanwakDescriptionContainer: {
-    marginRight: 18,
-  },
-  badges: {
-    marginLeft: 11,
-    marginBottom: 30,
-  },
-  participantsContainer: {
-    flexDirection: "column",
-    height: 300,
-  },
-  participantsList: {
-    marginTop: 11,
-    marginBottom: 30,
-  },
-  chat: {
-    marginTop: 11,
-    marginRight: 18,
-  },
-  confirmButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 11,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    banner: {
+        width: windowDimensions.width,
+        height: 100,
+        marginTop: 29,
+        justifyContent: "space-between",
+        paddingLeft: 17,
+        paddingRight: 17,
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: StatusBar.currentHeight || 0,
+    },
+    backButton: {
+        position: "absolute",
+        zIndex: 10,
+    },
+    goButton: {
+        position: "absolute",
+        zIndex: 10,
+    },
+    generalInfoCleanwalk: {
+        marginTop: 11,
+        marginBottom: 11,
+        marginLeft: 18,
+    },
+    descriptionCleanwalk: {
+        marginBottom: 11,
+        marginLeft: 18,
+    },
+    cleanwakDescriptionContainer: {
+        marginRight: 18,
+    },
+    badges: {
+        marginLeft: 11,
+        marginBottom: 30,
+    },
+    participantsContainer: {
+        flexDirection: "column",
+        height: 300,
+    },
+    participantsList: {
+        marginTop: 11,
+        marginBottom: 30,
+    },
+    chat: {
+        marginTop: 11,
+        marginRight: 18,
+    },
+    confirmButton: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginBottom: 11,
+    },
 });
 
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(ConnectedEventDetailMapStack);

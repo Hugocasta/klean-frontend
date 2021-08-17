@@ -5,17 +5,24 @@ import {
   View,
   KeyboardAvoidingView,
   ScrollView,
+  SafeAreaView,
+  StatusBar
 } from "react-native";
+
 import { connect } from "react-redux";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import { colors } from "../lib/colors";
 import { windowDimensions } from "../lib/windowDimensions";
 import { typography } from "../lib/typography";
 import ButtonElement from "../lib/ButtonElement";
 import InputElement from "../lib/InputElement";
 import EventGuide from "../lib/EventGuide";
-import PROXY from "../proxy";
 import SearchBarElement from "../lib/SearchBarElement";
+
+import PROXY from "../proxy";
+
+/* Composant qui permet l'affichage de la page où l'utilisateur, après avoir défini les coordonnées d'une cleanwalk
+qu'il souhaite créer peut remplir les différentes informations nécessaires pour valider la création de cette dernière. */
 
 function EventFillInfo(props) {
   const [title, setTitle] = useState("");
@@ -28,23 +35,21 @@ function EventFillInfo(props) {
 
   const [modalVisible, setModalVisible] = useState(false);
 
+  /* Le champ de la ville est pré-rempli grâce aux informations reçues la page précédente */
   useEffect(() => {
     setCity(props.cityInfo.cityName);
   }, []);
 
-  function modal() {
+  function closeModal() {
     setModalVisible(false);
   }
 
+  /* Une fonction unique pour modifier l'ensemble des hooks d'état liés aux inputs de la page */
   let changeState = (name, value) => {
     if (name == "title") {
       setTitle(value);
     } else if (name == "city") {
       setCity(value);
-    } else if (name == "startingDate") {
-      setStartingDate(value);
-    } else if (name == "endingDate") {
-      setEndingDate(value);
     } else if (name == "description") {
       setDescription(value);
     } else if (name == "tool") {
@@ -52,15 +57,8 @@ function EventFillInfo(props) {
     }
   };
 
-  function cleanFields() {
-    setTitle("");
-    setCity("");
-    setStartingDate(new Date());
-    setEndingDate(new Date());
-    setDescription("");
-    setTool("");
-  }
 
+  /* Fonction permettant d'enregistrer la cleanwalk en base de données. */
   var addCW = async () => {
     const dataCW = await fetch(PROXY + "/create-cw", {
       method: "POST",
@@ -118,19 +116,17 @@ function EventFillInfo(props) {
               name="city"
               setState={changeState}
               value={city}
+              editable={false}
             />
             <SearchBarElement
               type="date"
               dateSearch={startingDate}
               setDateSearch={setStartingDate}
-            // resetDate={resetDate}
             />
             <SearchBarElement
               type="time"
               dateSearch={startingDate}
               setDateSearch={setStartingDate}
-            // reset={reset}
-            // setReset={setReset}
             />
 
             <SearchBarElement
@@ -161,13 +157,15 @@ function EventFillInfo(props) {
 
             {errors}
 
+            {/* Au clic sur le bouton avec un point d'interrogation, une modal apparaît avec un guide des bonnes
+            pratiques pour organiser une cleanwalk */}
             <Text style={styles.guide} style={typography.body}>Guide pour l'organisateur
               <ButtonElement
                 onPress={() => setModalVisible(true)}
                 typeButton="info"
               />
             </Text>
-            <EventGuide visible={modalVisible} close={modal} />
+            <EventGuide visible={modalVisible} close={closeModal} />
 
           </View>
 
@@ -218,6 +216,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 10,
     zIndex: 10,
+    paddingTop: StatusBar.currentHeight,
   },
   inputFields: {
     justifyContent: "center",

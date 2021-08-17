@@ -8,7 +8,9 @@ import {
   ScrollView,
   StatusBar,
 } from "react-native";
+
 import { connect } from "react-redux";
+
 import ScreenTitles from "../lib/ScreenTitles.js";
 import ButtonElement from "../lib/ButtonElement";
 import Participants from "../lib/Participants";
@@ -20,15 +22,19 @@ import changeDateFormat from "../lib/changeDateFormat";
 
 import PROXY from "../proxy.js";
 
+/* Composant permettant d'afficher la page contenant le détail des cleanwalks sur la stack de navigation
+de l'utilisateur non connecté */
+
 function InvitedEventDetail(props) {
 
   let idCW = props.cwIdInvited;
 
   const [cleanwalk, setCleanwalk] = useState(null);
 
+  /* Ajout de l'organisateur au début de la liste des participants (enregistré séparement en base de données)
+    pour envoyer le tableau en props du composant Participants */
   const dataParticipants = (admin, participants) => {
     participants.unshift(admin);
-
     return participants;
   };
 
@@ -137,12 +143,6 @@ function InvitedEventDetail(props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    login: function (token) {
-      dispatch({ type: "login", token });
-    },
-    signOut: function () {
-      dispatch({ type: "signOut" });
-    },
     resetCwIdInvited: function () {
       dispatch({ type: "resetCwIdInvited" });
     },
@@ -150,9 +150,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
-  return { 
-    tokenObj: state.tokenObj, 
-    cwIdInvited: state.cwIdInvited };
+  return {
+    tokenObj: state.tokenObj,
+    cwIdInvited: state.cwIdInvited
+  };
 }
 
 const styles = StyleSheet.create({
@@ -215,18 +216,3 @@ const styles = StyleSheet.create({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InvitedEventDetail);
-
-// <View style={styles.container}>
-//     <Text>InvitedEventDetail</Text>
-//     <Text>{`${props.token}`}</Text>
-//     <Button title="login" onPress={() => props.login("monsupertokenchercheenbdd")} />
-//     <Button title="signOut" onPress={() => props.signOut()} />
-//     <Button title="InvitedMapScreen"
-//         onPress={() => props.navigation.navigate('InvitedMapScreen')} />
-//     <Button title="InvitedEventDetail"
-//         onPress={() => props.navigation.navigate('InvitedEventDetail')} />
-//     <Button title="Login"
-//         onPress={() => props.navigation.navigate('Login')} />
-//     <Button title="SignUp"
-//         onPress={() => props.navigation.navigate('SignUp')} />
-// </View>

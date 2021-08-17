@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, StatusBar, SafeAreaView, ActivityIndicator } from 'react-native';
+
 import ScreenTitles from '../lib/ScreenTitles'
 import ListCities from '../lib/ListCities';
-import { connect } from 'react-redux';
 import { colors } from '../lib/colors';
 import { typography } from '../lib/typography';
 import { windowDimensions } from '../lib/windowDimensions';
+
+import { connect } from 'react-redux';
+
 import PROXY from '../proxy';
 
+/* Composant qui permet l'affichage de la page contenant le classement des villes */
 
 function CitiesRanking(props) {
 
@@ -27,6 +31,7 @@ function CitiesRanking(props) {
 
     if (listCities === null) {
         return (
+            /* Affichage d'un loader tant que la liste des villes n'est pas chargée */
             <View style={styles.wait}>
                 <ActivityIndicator size="large" color={colors.primary}/>
             </View>
@@ -38,6 +43,7 @@ function CitiesRanking(props) {
                     <Text style={styles.mainTitle}> CLASSEMENT DES VILLES </Text>
                 </SafeAreaView>
                 <ScreenTitles title="Liste des villes" titleType="secondary" />
+                {/* Composant permettant l'affichage des villes sous forme de flatlist */}
                 <ListCities data={listCities} />
                 <ScreenTitles title="Ma ville" titleType="secondary" />
                 <View style={styles.listItem}>
@@ -47,18 +53,6 @@ function CitiesRanking(props) {
                 </View>
             </View>
         );
-    }
-}
-
-
-function mapDispatchToProps(dispatch) {
-    return {
-        login: function (token) {
-            dispatch({ type: 'login', token })
-        },
-        signOut: function () {
-            dispatch({ type: 'signOut' })
-        }
     }
 }
 
@@ -120,122 +114,5 @@ const styles = StyleSheet.create({
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(CitiesRanking);
-
-let DATA = [
-        {
-            city: "Paris",
-            points: "1500",
-            isMyCity: false
-        },
-        {
-            city: "Marseille",
-            points: "1200",
-            isMyCity: true
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Paris",
-            points: "1100",
-            isMyCity: false
-        },
-        {
-            city: "Saint mandouille le puy en vezoulay",
-            points: "900",
-            isMyCity: false
-        }]

@@ -5,29 +5,33 @@ import {
   View,
   ImageBackground,
   KeyboardAvoidingView,
-  Button,
   ScrollView,
 } from "react-native";
+
 import { connect } from "react-redux";
+
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { colors } from "../lib/colors";
 import { windowDimensions, screenDimensions } from "../lib/windowDimensions";
 import { typography, Typography } from "../lib/typography";
 import ButtonElement from "../lib/ButtonElement";
 import InputElement from "../lib/InputElement";
 import LogoKlean from "../assets/imagesKlean/LogoKlean.png";
-import PROXY from "../proxy";
 import AutoComplete from "../lib/AutoComplete";
+
+import PROXY from "../proxy";
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function SignUp(props) {
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userExists, setUserExists] = useState(false);
   const [listErrorSignup, setListErrorSignup] = useState([]);
 
   const [autoComplete, setAutoComplete] = useState([]);
@@ -35,6 +39,8 @@ function SignUp(props) {
 
   const [cityInfo, setCityInfo] = useState({});
 
+  /* Lorsque'une recherche est faite via le champ ville, un appel est lancé au backend 
+  qui communique avec l'API des adresses du gouvernement. Les résultats sont affichés via le composant Autocomplete. */
   useEffect(() => {
     async function loadData() {
       let rawResponse = await fetch(PROXY + "/autocomplete-search-city-only", {
@@ -51,6 +57,7 @@ function SignUp(props) {
     }
   }, [city]);
 
+  /* Une fonction unique pour modifier l'ensemble des hooks d'état liés aux inputs de la page */
   let changeState = (name, value) => {
     if (name == "firstName") {
       setFirstName(value);
@@ -67,6 +74,8 @@ function SignUp(props) {
     }
   };
 
+  /* Fonction qui permet à l'utilisateur de s'inscrire et, s'il est dans un processus de participation à une cleanwalk,
+  permet de l'inscrire à cette cleanwalk */
   async function register() {
     let bodyWithoutID = `token=${props.tokenObj.token}&firstNameFromFront=${firstName}&lastNameFromFront=${lastName}&emailFromFront=${email}&cityFromFront=${city}&passwordFromFront=${password}&cityInfo=${JSON.stringify(cityInfo)}`;
     let bodyWithId = `token=${props.tokenObj.token}&firstNameFromFront=${firstName}&lastNameFromFront=${lastName}&emailFromFront=${email}&cityFromFront=${city}&passwordFromFront=${password}&cityInfo=${JSON.stringify(cityInfo)}&cleanwalkIdFromFront=${props.cwIdInvited}`;
@@ -88,8 +97,8 @@ function SignUp(props) {
 
       let body = await data.json();
       if (body.result == true) {
-        setUserExists(true);
         props.login(body.token);
+        /* Enregistrement du token en local storage */
         AsyncStorage.setItem('token', JSON.stringify({ token: body.token, IsFirstVisit: false }));
       } else {
         setListErrorSignup(body.error);
@@ -99,6 +108,7 @@ function SignUp(props) {
       setListErrorSignup(["Les deux mots de passe ne sont pas identiques."])
     }
   }
+
 
   let errorsRegister = listErrorSignup.map((error, i) => {
     return <Text key={`error${i}`}>{error}</Text>;
@@ -112,7 +122,6 @@ function SignUp(props) {
   if (props.cwIdInvited == null) {
     button = (
       <ButtonElement
-        style={styles.registerButton}
         typeButton="middleSecondary"
         text="M'inscrire"
         onPress={() => register()}
@@ -122,7 +131,6 @@ function SignUp(props) {
   if (props.cwIdInvited) {
     button = (
       <ButtonElement
-        style={styles.registerButton}
         typeButton="middleSecondary"
         text="M'inscrire et rejoindre"
         onPress={() => register()}
@@ -134,90 +142,92 @@ function SignUp(props) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.mainView}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        
-        <View style={styles.topBanner}>
-          <View style={styles.backButton}>
-            <ButtonElement typeButton="back" onPress={() => backArrow()} />
-          </View>
-          <View style={styles.title}>
-            <Text style={typography.h1}>INSCRIPTION</Text>
-          </View>
-        </View>
 
-        
-        <ScrollView>
-          <View style={styles.inputFields}>
-            <InputElement
-              name="firstName"
-              setState={changeState}
-              value={firstName}
-              placeholder="Prénom *"
-              type="simpleInput"
-            ></InputElement>
-            <InputElement
-              name="lastName"
-              setState={changeState}
-              value={lastName}
-              placeholder="Nom *"
-              type="simpleInput"
-            ></InputElement>
-            <InputElement
-              name="email"
-              setState={changeState}
-              value={email}
-              placeholder="Email *"
-              type="simpleInput"
-            ></InputElement>
-            <InputElement
-              name="city"
-              setState={changeState}
-              setShowAutoComplete={setShowAutoComplete}
-              value={city}
-              placeholder="Ville *"
-              type="simpleInput"
-            ></InputElement>
-            {showAutoComplete ? (
-              <AutoComplete
-                data={autoComplete}
-                onPress={setCity}
-                setShowAutoComplete={setShowAutoComplete}
-                cityInfoSetter={setCityInfo}
-              />
-            ) : null}
-
-            <InputElement
-              name="password"
-              setState={changeState}
-              placeholder="Password *"
-              type="simpleInput"
-              secureTextEntry={true}
-            ></InputElement>
-            <InputElement
-              name="confirmPassword"
-              setState={changeState}
-              placeholder="Confirm password *"
-              type="simpleInput"
-              secureTextEntry={true}
-            ></InputElement>
-          </View>
-          <View style={styles.error}>{errorsRegister}</View>
-
-          <View style={styles.register}>
-            {button}
-            <View style={styles.textContainer}>
-              <Text style={typography.body}>Vous avez déjà un compte?</Text>
-              <Text
-                style={(typography.body, styles.link)}
-                onPress={() => props.navigation.navigate("Login")}
-              >
-                Se connecter
-              </Text>
+          <View style={styles.topBanner}>
+            <View style={styles.backButton}>
+              <ButtonElement typeButton="back" onPress={() => backArrow()} />
+            </View>
+            <View style={styles.title}>
+              <Text style={typography.h1}>INSCRIPTION</Text>
             </View>
           </View>
-          <View style={styles.logoContainer}>
-            <ImageBackground source={LogoKlean} resizeMode="contain" style={styles.logo} />
-          </View>
-        </ScrollView>
+
+
+          <ScrollView>
+            <View style={styles.inputFields}>
+              <InputElement
+                name="firstName"
+                setState={changeState}
+                value={firstName}
+                placeholder="Prénom *"
+                type="simpleInput"
+              ></InputElement>
+              <InputElement
+                name="lastName"
+                setState={changeState}
+                value={lastName}
+                placeholder="Nom *"
+                type="simpleInput"
+              ></InputElement>
+              <InputElement
+                name="email"
+                setState={changeState}
+                value={email}
+                placeholder="Email *"
+                type="simpleInput"
+              ></InputElement>
+              <InputElement
+                name="city"
+                setState={changeState}
+                setShowAutoComplete={setShowAutoComplete}
+                value={city}
+                placeholder="Ville *"
+                type="simpleInput"
+              ></InputElement>
+              {/* Le composant AutoComplete ne s'affiche que lorsqu'une recherche est lancée.
+              cityInfoSetter correspond au setter pour mettre à jour les informations liées à la commune
+              et enregistrer ces informations en BDD si nécessaire */}
+              {showAutoComplete &&
+                <AutoComplete
+                  data={autoComplete}
+                  onPress={setCity}
+                  setShowAutoComplete={setShowAutoComplete}
+                  cityInfoSetter={setCityInfo}
+                />
+              }
+              <InputElement
+                name="password"
+                setState={changeState}
+                placeholder="Password *"
+                type="simpleInput"
+                secureTextEntry={true}
+              ></InputElement>
+              <InputElement
+                name="confirmPassword"
+                setState={changeState}
+                placeholder="Confirm password *"
+                type="simpleInput"
+                secureTextEntry={true}
+              ></InputElement>
+            </View>
+            <View style={styles.error}>{errorsRegister}</View>
+
+            <View style={styles.register}>
+              {button}
+              <View style={styles.textContainer}>
+                <Text style={typography.body}>Vous avez déjà un compte?</Text>
+                <Text
+                  style={(typography.body, styles.link)}
+                  onPress={() => props.navigation.navigate("Login")}
+                >
+                  Se connecter
+                </Text>
+              </View>
+            </View>
+            <View style={styles.logoContainer}>
+              <ImageBackground source={LogoKlean} resizeMode="contain" style={styles.logo} />
+            </View>
+          </ScrollView>
 
         </KeyboardAvoidingView>
       </View>
@@ -229,9 +239,6 @@ function mapDispatchToProps(dispatch) {
   return {
     login: function (token) {
       dispatch({ type: "login", token });
-    },
-    signOut: function () {
-      dispatch({ type: "signOut" });
     },
   };
 }
@@ -261,7 +268,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    left: "10%",
+    left: windowDimensions.width*0.1,
     zIndex: 10,
   },
   title: {
@@ -275,9 +282,6 @@ const styles = StyleSheet.create({
   register: {
     marginTop: 50,
     alignItems: "center",
-  },
-  registerButton: {
-    // paddingBottom: 10,
   },
   textContainer: {
     justifyContent: "center",

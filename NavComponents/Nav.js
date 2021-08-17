@@ -12,7 +12,8 @@ function Nav(props) {
 
   useEffect(() => {
 
-    //Fonction qui permet de récupérer les IDs des cleanwalk de l'utilisateur pour dynamiser la page détail
+    /* Fonction qui permet de récupérer les IDs des cleanwalks de l'utilisateur (qu'il organise/auxquelles il participe) 
+    pour dynamiser la page détail des cleanwalks (EventDetail) */
     const loadCws = async (token) => {
       let rawResponse = await fetch(`${PROXY}/load-cw-forstore/${token}`);
       let response = await rawResponse.json();

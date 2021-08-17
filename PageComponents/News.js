@@ -1,10 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar } from 'react-native';
+
 import { connect } from 'react-redux';
+
 import { colors } from '../lib/colors';
 import { typography } from '../lib/typography';
 import NewsCards from '../lib/NewsCards';
 import ScreenTitles from '../lib/ScreenTitles';
+
+/* Composant qui permet l'affichage de la page avec les articles d'actualité liée à l'environnement */
 
 function News(props) {
 
@@ -94,17 +98,6 @@ function News(props) {
 }
 
 
-function mapDispatchToProps(dispatch) {
-    return {
-        login: function (token) {
-            dispatch({ type: 'login', token })
-        },
-        signOut: function () {
-            dispatch({ type: 'signOut' })
-        }
-    }
-}
-
 function mapStateToProps(state) {
     return { tokenObj: state.tokenObj }
 }
@@ -136,8 +129,5 @@ const styles = StyleSheet.create({
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(News);
-
-// <Button title="login" onPress={() => props.login("monsupertokenchercheenbdd")} />
-// <Button title="signOut" onPress={() => props.signOut()} />

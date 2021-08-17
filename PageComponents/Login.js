@@ -7,24 +7,32 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
+
 import { connect } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { colors } from "../lib/colors";
 import { windowDimensions } from "../lib/windowDimensions";
 import { typography, Typography } from "../lib/typography";
 import ButtonElement from "../lib/ButtonElement";
 import InputElement from "../lib/InputElement";
 import LogoKlean from "../assets/imagesKlean/LogoKlean.png";
+
 import PROXY from "../proxy";
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+/* Composant qui permet l'affichage de la page pour se connecter à l'application */
+
 function Login(props) {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [userExists, setUserExists] = useState(false);
   const [listErrorLogin, setListErrorLogin] = useState([]);
 
+  /* Fonction qui permet à l'utilisateur de se connecter et, s'il est dans un processus de participation à une cleanwalk,
+  permet de l'inscrire à cette cleanwalk */
   async function login() {
     let bodyWithoutID = `emailFromFront=${email}&passwordFromFront=${password}`;
     let bodyWithId = `emailFromFront=${email}&passwordFromFront=${password}&cleanwalkIdFromFront=${props.cwIdInvited}`;
@@ -44,11 +52,13 @@ function Login(props) {
 
     let body = await data.json();
     if (body.result == true) {
-      setUserExists(true);
       props.login(body.token);
+      /* Requête qui permet de récupérer les IDs des cleanwalks de l'utilisateur (qu'il organise/auxquelles il participe) 
+      pour dynamiser la page détail des cleanwalks (EventDetail) */
       let rawResponse = await fetch(`${PROXY}/load-cw-forstore/${body.token}`);
       let response = await rawResponse.json();
       props.loadCwsStore({ infosCWparticipate: response.infosCWparticipate, infosCWorganize: response.infosCWorganize });
+      /* Enregistrement du token en local storage */
       AsyncStorage.setItem('token', JSON.stringify({ token: body.token, IsFirstVisit: false }));
     } else {
       setListErrorLogin(body.error);
@@ -59,6 +69,7 @@ function Login(props) {
     return <Text key={`error${i}`}>{error}</Text>;
   });
 
+  /* Une fonction unique pour modifier l'ensemble des hooks d'état liés aux inputs de la page */
   let changeState = (name, value) => {
     if (name == "email") {
       setEmail(value);
@@ -97,51 +108,51 @@ function Login(props) {
       <View style={styles.mainView}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
 
-        <View style={styles.topBanner}>
-          <View style={styles.backButton}>
-            <ButtonElement typeButton="back" onPress={() => backArrow()} />
-          </View>
-          <View style={styles.title}>
-            <Text style={typography.h1}>CONNEXION</Text>
-          </View>
-        </View>
-
-        <ScrollView>
-          <View style={styles.inputFields}>
-            <InputElement
-              name="email"
-              setState={changeState}
-              placeholder="Email *"
-              type="simpleInput"
-            ></InputElement>
-            <InputElement
-              name="password"
-              setState={changeState}
-              placeholder="Password *"
-              type="simpleInput"
-              secureTextEntry={true}
-            ></InputElement>
-          </View>
-
-          <View style={styles.error}>{errorsLogin}</View>
-
-          <View style={styles.register}>
-            {button}
-            <View style={styles.textContainer}>
-              <Text style={typography.body}>Vous n'avez pas de compte?</Text>
-              <Text
-                style={(typography.body, styles.link)}
-                onPress={() => props.navigation.navigate("SignUp")}
-              >
-                Inscrivez-vous.
-              </Text>
+          <View style={styles.topBanner}>
+            <View style={styles.backButton}>
+              <ButtonElement typeButton="back" onPress={() => backArrow()} />
+            </View>
+            <View style={styles.title}>
+              <Text style={typography.h1}>CONNEXION</Text>
             </View>
           </View>
-          <View style={styles.logoContainer}>
-            <ImageBackground source={LogoKlean} resizeMode="contain" style={styles.logo} />
-          </View>
-        </ScrollView>
-        
+
+          <ScrollView>
+            <View style={styles.inputFields}>
+              <InputElement
+                name="email"
+                setState={changeState}
+                placeholder="Email *"
+                type="simpleInput"
+              ></InputElement>
+              <InputElement
+                name="password"
+                setState={changeState}
+                placeholder="Password *"
+                type="simpleInput"
+                secureTextEntry={true}
+              ></InputElement>
+            </View>
+
+            <View style={styles.error}>{errorsLogin}</View>
+
+            <View style={styles.register}>
+              {button}
+              <View style={styles.textContainer}>
+                <Text style={typography.body}>Vous n'avez pas de compte?</Text>
+                <Text
+                  style={(typography.body, styles.link)}
+                  onPress={() => props.navigation.navigate("SignUp")}
+                >
+                  Inscrivez-vous.
+                </Text>
+              </View>
+            </View>
+            <View style={styles.logoContainer}>
+              <ImageBackground source={LogoKlean} resizeMode="contain" style={styles.logo} />
+            </View>
+          </ScrollView>
+
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
@@ -152,9 +163,6 @@ function mapDispatchToProps(dispatch) {
   return {
     login: function (token) {
       dispatch({ type: "login", token });
-    },
-    signOut: function () {
-      dispatch({ type: "signOut" });
     },
     loadCwsStore: function (cwsStore) {
       dispatch({ type: "loadCwsStore", cwsStore });

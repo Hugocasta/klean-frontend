@@ -1,18 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, StatusBar, View, Text, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  StatusBar,
+  View,
+  Text,
+  SafeAreaView
+} from "react-native";
+
 import { connect } from "react-redux";
+
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+
 import * as Location from "expo-location";
+
 import ButtonElement from "../lib/ButtonElement";
 import SearchBarElement from "../lib/SearchBarElement";
 import { colors } from "../lib/colors";
 import pinSmall from "../assets/imagesKlean/pinSmall.png";
 import { windowDimensions } from "../lib/windowDimensions";
 import { typography } from "../lib/typography";
-import PROXY from "../proxy";
 import AutoComplete from "../lib/AutoComplete";
 
+import PROXY from "../proxy";
+
+/* Composant qui permet l'affichage de la page permettant à l'utilisateur de définir les coordonnées d'une
+cleanwalk qu'il souhaite créer */
+
 function CreateEvent(props) {
+
   const [region, setRegion] = useState();
   const [newCleanwalk, setNewCleanwalk] = useState(null);
 
@@ -20,32 +35,35 @@ function CreateEvent(props) {
   const [showAutoComplete, setShowAutoComplete] = useState(false);
   const [adress, setAdress] = useState("");
 
-  // à terminer pour géolocaliser le user au clic sur le picto géoloc
+  /* Hook d'effet permettant de modifier la region de la carte (partie visible) en fonction de la localisation
+  de l'utilisateur */
   useEffect(() => {
     async function getLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
         let location = await Location.getCurrentPositionAsync({});
-            setRegion({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            });
-          }
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
       }
+    }
     getLocation();
   }, []);
 
+   /* Lorsque'une recherche est faite via le champ d'adresse (modification du champ), un appel est lancé au backend 
+  qui communique avec l'API des adresses du gouvernement. Les résultats sont affichés via le composant Autocomplete. */
   useEffect(() => {
     async function loadData() {
-        let rawResponse = await fetch(PROXY + '/autocomplete-search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `adress=${adress.replace(" ", "+")}&token=${props.tokenObj.token}`
-        });
-        let response = await rawResponse.json();
-        setAutoComplete(response.response)
+      let rawResponse = await fetch(PROXY + '/autocomplete-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `adress=${adress.replace(" ", "+")}&token=${props.tokenObj.token}`
+      });
+      let response = await rawResponse.json();
+      setAutoComplete(response.response)
     };
     if (adress.length != null) {
       loadData();
@@ -53,11 +71,14 @@ function CreateEvent(props) {
     }
   }, [adress]);
 
+  /* Au clic sur une adresse proposée par l'autocomplete, on veut non seulement modifier la "region" mais également 
+  enregistrer les coordonnées comme étant celles de la cleanwalk */
   function setRegionAndCw(item) {
     setRegion(item);
     setNewCleanwalk({ latitude: item.latitude, longitude: item.longitude });
   }
 
+  /* Fonction utilisée lors de l'ajout manuel d'une cleanwalk (l'utilisateur appuye sur la carte) */
   function addCleanwalk(e) {
     setNewCleanwalk({
       latitude: e.nativeEvent.coordinate.latitude,
@@ -65,19 +86,23 @@ function CreateEvent(props) {
     });
   }
 
+  /* Fonction permettant de géolocaliser l'utilisateur */
   async function centerOnUser() {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
       let location = await Location.getCurrentPositionAsync({});
-            setRegion({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            });
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
     }
   }
 
+  /* Fonction qui envoie les coordonnées de la cleanwalk au backend pour récupérer dans un premier temps la commune.
+  Puis une deuxième route permet d'appliquer un filtre pour ne pas avoir de commune correspondant 
+  à un arrondissement */
   async function continueToForm() {
     let data = await fetch(PROXY + "/get-city-from-coordinates", {
       method: "POST",
@@ -95,6 +120,8 @@ function CreateEvent(props) {
     });
     let newResponse = await newData.json();
 
+    /* Les informations de la commune ainsi que les coordonnées de la cleanwalk sont ensuite envoyées dans le store
+    pour dynamiser l'affichage de la page suivante (composant "EventFillInfo") */
     props.sendCityInfo({
       cityName: newResponse.newResponse[0].properties.city,
       cityCode: newResponse.newResponse[0].properties.citycode,
@@ -125,13 +152,14 @@ function CreateEvent(props) {
             data={autoComplete}
             onPress={setAdress}
             setShowAutoComplete={setShowAutoComplete}
+            /* Ajout d'une cleanwalk via le champ de recherche d'adresses et le système d'autocomplete */
             regionSetter={setRegionAndCw}
           />
         ) : null}
       </View>
       <MapView
         region={region}
-        onRegionChangeComplete={ (newRegion) => {
+        onRegionChangeComplete={(newRegion) => {
           setRegion(newRegion)
         }}
         style={styles.container}
@@ -142,6 +170,7 @@ function CreateEvent(props) {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        /* Ajout d'une cleanwalk manuellement */
         onLongPress={(e) => addCleanwalk(e)}
       >
         {newCleanwalk ? (
@@ -152,7 +181,8 @@ function CreateEvent(props) {
             }}
             image={pinSmall}
             draggable
-            onDragEnd = {(e) => setNewCleanwalk(e.nativeEvent.coordinate)}
+            /* Modification d'une cleanwalk manuellement */
+            onDragEnd={(e) => setNewCleanwalk(e.nativeEvent.coordinate)}
           />
         ) : null}
       </MapView>
@@ -176,12 +206,6 @@ function CreateEvent(props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    login: function (token) {
-      dispatch({ type: "login", token });
-    },
-    signOut: function () {
-      dispatch({ type: "signOut" });
-    },
     sendCityInfo: function (cityInfo) {
       dispatch({ type: "sendCityInfo", payLoad: cityInfo });
     },

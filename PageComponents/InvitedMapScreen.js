@@ -7,18 +7,26 @@ import {
   Button,
   Pressable,
 } from "react-native";
+
 import { connect } from "react-redux";
+
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+
 import * as Location from "expo-location";
+
 import ButtonElement from "../lib/ButtonElement";
 import SearchBarElement from "../lib/SearchBarElement";
 import { colors } from "../lib/colors";
 import pinSmall from "../assets/imagesKlean/pinSmall.png";
 import PreviewEvent from "./PreviewEvent";
 import AutoComplete from "../lib/AutoComplete";
+
 import PROXY from "../proxy";
 
+/* Composant permettant l'affichage de la page avec la carte contenant les cleanwalks */
+
 function InvitedMapScreen(props) {
+
   const [isVisiblePreview, setIsVisiblePreview] = useState(false);
   const [dateSearch, setDateSearch] = useState(new Date());
   const [adress, setAdress] = useState("");
@@ -33,6 +41,8 @@ function InvitedMapScreen(props) {
   const [listPositionCW, setListPositionCW] = useState([]);
   const [previewInfo, setPreviewInfo] = useState(null);
 
+  /* Nous avons choisi de ne récupérer qu'une seule fois la position de l'utilisateur. La fonction
+    doit être relancée pour mettre à jour sa position */
   const geoLoc = async () => {
     location = await Location.getCurrentPositionAsync({});
       setCurrentRegion({
@@ -43,6 +53,7 @@ function InvitedMapScreen(props) {
     });
   };
 
+  /* Demande la permission de l'utilisateur pour obtenir sa localisation à la première connexion */
   useEffect(() => {
     async function askPermissions() {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -53,10 +64,13 @@ function InvitedMapScreen(props) {
     askPermissions();
   }, []);
 
+  /* Chargement des cleanwalks sur la carte lorsque la date de début dans le champ de recherche est modifiée*/
   useEffect(() => {
     loadCleanwalk(currentRegion, dateSearch);
   }, [dateSearch]);
 
+  /* Lorsque'une recherche est faite via le champ d'adresse (modification du champ), un appel est lancé au backend 
+  qui communique avec l'API des adresses du gouvernement. Les résultats sont affichés via le composant Autocomplete. */
   useEffect(() => {
     async function loadData() {
       let rawResponse = await fetch(PROXY + "/autocomplete-search", {
@@ -73,6 +87,8 @@ function InvitedMapScreen(props) {
     }
   }, [adress]);
 
+   /* Fonction qui permet l'affichage dynamique des cleanwalks sur la carte en fonction de la latitude et longitude
+  delta de la "region" (partie de la carte visible) */
   const loadCleanwalk = async (currentRegion, dateSearch) => {
     let rawResponse = await fetch(PROXY + "/load-pin-on-change-region", {
       method: "POST",
@@ -85,6 +101,7 @@ function InvitedMapScreen(props) {
     setListPositionCW(response.cleanWalkArray);
   };
 
+  /* Liste des markers présents sur la carte, représentant des cleanwalks */
   const markers = listPositionCW.map((marker, i) => {
     return (
       <Marker
@@ -121,6 +138,9 @@ function InvitedMapScreen(props) {
         />
       </View>
       <View>
+         {/* Le composant AutoComplete ne s'affiche que lorsqu'une recherche est lancée.
+        regionSetter correspond au setter pour mettre à jour les coordonnées de la region et modifier 
+        la vue sur la carte (au clic sur une des adresses de la liste) */}
         {showAutoComplete ? (
           <AutoComplete
             data={autoComplete}
@@ -156,6 +176,8 @@ function InvitedMapScreen(props) {
           firstnameOrga={previewInfo.admin.firstName}
           avatar={previewInfo.admin.avatarUrl}
           onPress={() => {
+            /* Au clic, l'ID de la cleanwalk est envoyé au store car nécessaire pour l'affichage 
+          du composant "EventDetail" */
             props.setCwIdInvited(previewInfo._id);
             props.navigation.navigate("InvitedEventDetail");
           }}
@@ -175,12 +197,6 @@ function InvitedMapScreen(props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    login: function (token) {
-      dispatch({ type: "login", token });
-    },
-    signOut: function () {
-      dispatch({ type: "signOut" });
-    },
     setCwIdInvited: function (id) {
       dispatch({ type: "setCwIdInvited", id });
     },

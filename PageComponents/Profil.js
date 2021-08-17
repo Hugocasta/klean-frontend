@@ -6,7 +6,8 @@ import {
   StatusBar,
   Image,
   SafeAreaView,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView
 } from "react-native";
 
 import { colors } from "../lib/colors";
@@ -14,17 +15,23 @@ import { typography } from "../lib/typography";
 import ScreenTitles from "../lib/ScreenTitles";
 import ButtonElement from "../lib/ButtonElement";
 import CleanwalkList from "../lib/CleanwalkList";
-
-import { connect } from "react-redux";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { windowDimensions } from "../lib/windowDimensions";
 import ChangePassword from "../lib/ChangePassword";
-import { ScrollView } from "react-native-gesture-handler";
+
+import { connect } from "react-redux";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import * as ImagePicker from 'expo-image-picker';
 
 import PROXY from "../proxy";
 
+
+
+/* Composant qui permet l'affichage de la page profil */
+
 function Profil(props) {
+
   const [isCwOnOrganize, setIsCwOnOrganize] = useState(true);
   const [isStatOnPerso, setIsStatOnPerso] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -48,7 +55,9 @@ function Profil(props) {
   const [statPerso, setStatPerso] = useState(null);
   const [statCity, setStatCity] = useState(null);
 
+  /* Hook d'effet qui permet de récupérer l'ensemble des informations nécessaires à la page */
   useEffect(() => {
+    /* la variable mounted permet de corriger un warning sur la mise à jour d'un état d'un composant démonté */
     let mounted = true;
     const loadProfil = async () => {
       let rawResponse = await fetch(
@@ -69,6 +78,8 @@ function Profil(props) {
     return () => mounted = false
   }, [props.cwsStore]);
 
+  /* Hook d'effet permettant de récupérer l'autorisation de l'utilisateur pour accéder à la galerie de ses photos.
+  Cette autorisation est nécessaire pour modifier la photo de profil */
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
@@ -80,6 +91,7 @@ function Profil(props) {
     })();
   }, []);
 
+  /* Fonction qui permet d'ouvrir la galerie photo de l'utilisateur et renvoie l'uri de la photo selectionnée */
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -101,9 +113,11 @@ function Profil(props) {
 
   const signoutAppli = () => {
     props.signOut();
+    /* Supprime le token du local storage */
     AsyncStorage.setItem('token', JSON.stringify({ token: "XeDLDMr3U4HSJSl74HJpKD", IsFirstVisit: false }));
   }
 
+  /* Affichage des listes de cleanwalks (participe ou organise) */
   let cwListParticipate;
   if (listCWparticipate.length > 0) {
     cwListParticipate = (
@@ -155,6 +169,7 @@ function Profil(props) {
     statCity === null
   ) {
     return (
+      /* Affichage d'un loader tant que les données n'ont pas été récupérées du backend */
       <View style={styles.wait}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
@@ -174,6 +189,8 @@ function Profil(props) {
           </View>
         </SafeAreaView>
         <ScrollView>
+          {/* Affichage conditionnel en fonction du clic sur le bouton : affichage des cleanwalks que l'utilisateur organise
+          ou celles auxquelles il participe */}
           {isCwOnOrganize ? (
             <>
               <ScreenTitles title="Cleanwalks" titleType="secondary" />
@@ -214,6 +231,8 @@ function Profil(props) {
             </>
           )}
 
+          {/* Affichage conditionnel en fonction du clic sur le bouton : affichage des statistiques personnelles
+          ou de celles de la ville de l'utilisateur */}
           {isStatOnPerso ? (
             <>
               <ScreenTitles title="Statistiques" titleType="secondary" />
@@ -232,6 +251,7 @@ function Profil(props) {
                 />
               </View>
               <View style={styles.stat}>
+                {/* Mise à jour du badge en fonction du nombre de cleanwalks réalisées ou à venir */}
                 <Image
                   style={styles.robot}
                   source={
@@ -313,8 +333,9 @@ function Profil(props) {
               <ButtonElement
                 text="Modifier ma photo"
                 typeButton="password"
-
+                /* Fonction anonyme qui permet de modifier la photo de profil de l'utilisateur */
                 onPress={async () => {
+                  /* L'utilisateur récupère une image dans sa gallerie photo */
                   let image = await pickImage();
 
                   if (image) {
@@ -324,7 +345,8 @@ function Profil(props) {
                       type: 'image/jpeg',
                       name: 'avatar.jpg',
                     });
-
+                    /* L'image est envoyée au backend pour être chargée sur cloudinary. L'url est ensuite enregistrée
+                    en base de donnée. */
                     var rawResponse = await fetch(PROXY + `/upload-photo/${props.tokenObj.token}`, {
                       method: 'POST',
                       body: data
@@ -332,6 +354,8 @@ function Profil(props) {
 
                     var response = await rawResponse.json();
 
+                    /* La photo de profil est mise à jour dans l'état qui contient les informations
+                    de l'utilisateur */
                     if (response.result) {
                       let copy = { ...infosUser }
                       copy.avatarUrl = response.resultCloudinary.secure_url
@@ -442,9 +466,6 @@ const styles = StyleSheet.create({
 
 function mapDispatchToProps(dispatch) {
   return {
-    login: function (token) {
-      dispatch({ type: "login", token });
-    },
     signOut: function () {
       dispatch({ type: "signOut" });
     },

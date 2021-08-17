@@ -1,8 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
+
 import { connect } from 'react-redux';
+
 import CarrousselOnboarding from '../lib/CarrousselOnboarding';
 import ButtonElement from '../lib/ButtonElement';
+
+/* Composant qui permet l'affichage de l'onboarding */
 
 function OnBoarding(props) {
 
@@ -18,18 +22,6 @@ function OnBoarding(props) {
             </View>
         </View>
     );
-}
-
-
-function mapDispatchToProps(dispatch) {
-    return {
-        login: function (token) {
-            dispatch({ type: 'login', token })
-        },
-        signOut: function () {
-            dispatch({ type: 'signOut' })
-        }
-    }
 }
 
 function mapStateToProps(state) {
@@ -49,18 +41,5 @@ const styles = StyleSheet.create({
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(OnBoarding);
-
-{/*<Text>OnBoarding</Text>
-            <Text>{`${props.token}`}</Text>
-            <Button title="login" onPress={() => props.login("gBzHa7pYcI013YM1IMSGnzLqLkgekND4")} />
-            <Button title="signOut" onPress={() => props.signOut()} />
-            <Button title="InvitedMapScreen"
-                onPress={() => props.navigation.navigate('InvitedMapScreen')} />
-            <Button title="InvitedEventDetail"
-                onPress={() => props.navigation.navigate('InvitedEventDetail')} />
-            <Button title="Login"
-                onPress={() => props.navigation.navigate('Login')} />
-            <Button title="SignUp"
-                onPress={() => props.navigation.navigate('SignUp')} />*/}

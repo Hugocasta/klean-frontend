@@ -1,15 +1,20 @@
 import React from "react";
 import { Text, View, StyleSheet, Image, Pressable } from 'react-native';
+
 import { colors } from "../lib/colors";
 import { windowDimensions } from "../lib/windowDimensions";
 import Badges from '../lib/Badges';
 import BadgesList from '../lib/BadgesList'
 import { typography } from "../lib/typography";
 
+/* Composant qui permet l'affichage de la prévisualisation de la cleanwalk lorsque l'utilisateur est sur l'écran
+avec la map */
+
 function PreviewEvent(props) {
 
     const styles = StyleSheet.create({
         previewEvent: {
+            /* Permet de définir si la preview est visible ou non */
             display: props.visible ? 'flex' : 'none',
         },
         previewEventTitle: {
@@ -51,6 +56,7 @@ function PreviewEvent(props) {
         }
     });
 
+    /* Les informations textuelles sont tronquées afin d'éviter des bugs d'affichage */
     let nameOrga = '';
     if (props.nameOrga.length > 10) {
         nameOrga = `${props.nameOrga.substr(0, 10)}...`;
@@ -82,6 +88,7 @@ function PreviewEvent(props) {
                     {titlePreviewEvent}
                 </Text>
             </Pressable>
+
             <View style={styles.ctPreviewEvent}>
                 <View style={styles.ctPreviewEventTxt}>
                     <Text style={styles.previewEventDesc}>
@@ -100,6 +107,7 @@ function PreviewEvent(props) {
                     <Badges type="orange" />
                 </View>
             </View>
+
         </View>
     )
 }

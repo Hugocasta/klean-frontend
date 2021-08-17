@@ -12,6 +12,8 @@ import ChatList from "../lib/ChatList";
 import PROXY from "../proxy";
 import { useIsFocused } from '@react-navigation/native';
 
+/* Composant qui permet l'affichage du chat dans la stack de navigation du profil */
+
 function ChatProfilStack(props) {
     let token = props.tokenObj.token
     let cwid = props.cwIdProfilStack
@@ -21,6 +23,8 @@ function ChatProfilStack(props) {
     const [messageEnvoie, setMessageEnvoie] = useState()
     const [loadInterval, setLoadInterval] = useState()
 
+    /* Hook d'effet qui permet de définir un intervalle qui fait un appel à la base de données pour récupérer
+    les messages toutes les 5 secondes */
     useEffect(() => {
         async function loadData() {
             let rawResponse = await fetch(PROXY + `/load-messages/${token}/${cwid}`);
@@ -72,6 +76,7 @@ function ChatProfilStack(props) {
                 />
             </View>
 
+            {/* Affichage d'un loader tant que les messages n'ont pas été récupérés depuis le backend */}
             {messages ? <ChatList data={messages} /> : (
                 <View style={styles.wait}>
                     <ActivityIndicator size="large" color={colors.primary} />
@@ -98,16 +103,6 @@ function ChatProfilStack(props) {
     );
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        login: function (token) {
-            dispatch({ type: 'login', token })
-        },
-        signOut: function () {
-            dispatch({ type: 'signOut' })
-        }
-    }
-}
 
 function mapStateToProps(state) {
     return { 
@@ -151,5 +146,5 @@ const styles = StyleSheet.create({
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    null
 )(ChatProfilStack);

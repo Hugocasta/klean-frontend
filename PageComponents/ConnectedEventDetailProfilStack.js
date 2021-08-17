@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground, SafeAreaView, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    ImageBackground,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    ActivityIndicator
+} from 'react-native';
+
 import { connect } from 'react-redux';
+
 import ScreenTitles from '../lib/ScreenTitles.js';
 import ButtonElement from "../lib/ButtonElement";
 import Participants from "../lib/Participants";
@@ -9,9 +20,13 @@ import { windowDimensions } from '../lib/windowDimensions.js';
 import { typography } from '../lib/typography.js';
 import { colors } from "../lib/colors.js";
 import changeDateFormat from "../lib/changeDateFormat"
+
 import { showLocation } from 'react-native-map-link';
 
 import PROXY from "../proxy.js";
+
+/* Composant permettant d'afficher la page contenant le détail des cleanwalks sur la stack de navigation
+du profil */
 
 function ConnectedEventDetailProfilStack(props) {
 
@@ -20,6 +35,8 @@ function ConnectedEventDetailProfilStack(props) {
     const [cleanwalk, setCleanwalk] = useState(null);
     const [error, setError] = useState(null);
 
+    /* Ajout de l'organisateur au début de la liste des participants (enregistré séparement en base de données)
+    pour envoyer le tableau en props du composant Participants */
     const dataParticipants = (admin, participants) => {
         participants.unshift(admin);
         return participants;
@@ -36,6 +53,7 @@ function ConnectedEventDetailProfilStack(props) {
     }, []);
 
     const unsubscribeCw = async () => {
+        /* Mise à jour de la désinscription de l'utilisateur en BDD */
         let rawResponse = await fetch(`${PROXY}/unsubscribe-cw`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -44,29 +62,36 @@ function ConnectedEventDetailProfilStack(props) {
 
         let body = await rawResponse.json();
         if (body.result == true) {
+            /* Suppression de l'ID de la cleanwalk dans le store pour l'affichage dynamique des boutons sur la page
+            pour la désinscription ou la suppression de la cleanwalk */
             props.desinsCws(idCW);
             props.navigation.navigate("Profil");
-        } if (body.result == false){
+        } if (body.result == false) {
             setError(body.error)
         }
-    
+
     }
 
     const deleteCw = async () => {
+        /* Mise à jour de la suppression de la cleanwalk en BDD */
         let rawResponse = await fetch(`${PROXY}/delete-cw/${props.tokenObj.token}/${idCW}`, {
             method: 'DELETE'
         });
 
         let body = await rawResponse.json();
         if (body.result == true) {
+            /* Suppression de l'ID de la cleanwalk dans le store pour l'affichage dynamique des boutons sur la page
+            pour la désinscription ou la suppression de la cleanwalk */
             props.supCws(idCW);
             props.navigation.navigate("Profil");
-        } if (body.result == false){
+        } if (body.result == false) {
             setError(body.error)
         }
 
     }
 
+    /* Affichage dynamique du bouton en fin de page (Suppression ou désinscription à la cleanwalk)
+    à partir des éléments enregistrés dans le store */
     const checkCwsOrganize = props.cwsStore.infosCWorganize.findIndex(
         index => index.toString() === idCW.toString()
     );
@@ -74,32 +99,33 @@ function ConnectedEventDetailProfilStack(props) {
     let confirmButton;
     if (checkCwsOrganize !== -1) {
         confirmButton = <View style={styles.confirmButton}>
-                            <ButtonElement
-                                typeButton="middleSecondary"
-                                text="Supprimer la cleanwalk"
-                                onPress={ () => deleteCw() }
-                            />
-                        </View>;
+            <ButtonElement
+                typeButton="middleSecondary"
+                text="Supprimer la cleanwalk"
+                onPress={() => deleteCw()}
+            />
+        </View>;
     } else {
         confirmButton = <View style={styles.confirmButton}>
-                            <ButtonElement
-                                typeButton="middleSecondary"
-                                text="Se désinscrire"
-                                onPress={ () => unsubscribeCw() }
-                            />
-                        </View>;
+            <ButtonElement
+                typeButton="middleSecondary"
+                text="Se désinscrire"
+                onPress={() => unsubscribeCw()}
+            />
+        </View>;
     }
 
     let errors = (
         <View>
-            <Text>{error};</Text>
+            <Text>{error}</Text>
         </View>
     );
-    
+
+    /* Affichage d'un loader tant que la cleanwalk n'a pas été récupérée depuis le backend */
     if (cleanwalk === null) {
         return (
             <View style={styles.wait}>
-                <ActivityIndicator size="large" color={colors.primary}/>
+                <ActivityIndicator size="large" color={colors.primary} />
             </View>
         )
     } else {
@@ -121,11 +147,13 @@ function ConnectedEventDetailProfilStack(props) {
                         <ButtonElement
                             style={styles.goButton}
                             typeButton="go"
+                            /* Fonction importée depuis le module map-link qui permet d'afficher le point d'intérêt
+                            sur l'application carte native de l'appareil */
                             onPress={() => showLocation({
                                 latitude: cleanwalk.cleanwalkCoordinates.latitude,
                                 longitude: cleanwalk.cleanwalkCoordinates.longitude,
                                 title: cleanwalk.cleanwalkTitle,
-                            })} 
+                            })}
                         />
                     </ImageBackground>
 
@@ -164,6 +192,7 @@ function ConnectedEventDetailProfilStack(props) {
                     <View style={styles.participantsContainer}>
 
                         <View style={styles.participantsList}>
+                            {/* L'organisateur doit toujours être situé au début du tableau */}
                             <Participants data={dataParticipants(cleanwalk.admin, cleanwalk.participantsList)} />
                         </View>
 
@@ -200,8 +229,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
-    return { 
-        tokenObj: state.tokenObj, 
+    return {
+        tokenObj: state.tokenObj,
         cwIdProfilStack: state.cwIdProfilStack,
         cwsStore: state.cwsStore
     };
