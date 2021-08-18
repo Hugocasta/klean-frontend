@@ -77,7 +77,6 @@ function EventFillInfo(props) {
       const idCW = body.cleanwalkSave._id;
       props.addCwsOrga(idCW);
       props.navigation.navigate("Profil");
-      cleanFields();
     }
   };
 
