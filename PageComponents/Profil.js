@@ -113,7 +113,7 @@ function Profil(props) {
 
   const signoutAppli = () => {
     props.signOut();
-    /* Supprime le token du local storage */
+    /* Supprime le token du local storage. La variable IsFirstVisit reste à false pour ne pas afficher l'onboarding */
     AsyncStorage.setItem('token', JSON.stringify({ token: "XeDLDMr3U4HSJSl74HJpKD", IsFirstVisit: false }));
   }
 
