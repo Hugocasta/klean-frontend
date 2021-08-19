@@ -34,8 +34,8 @@ function Login(props) {
   /* Fonction qui permet à l'utilisateur de se connecter et, s'il est dans un processus de participation à une cleanwalk,
   permet de l'inscrire à cette cleanwalk */
   async function login() {
-    let bodyWithoutID = `emailFromFront=${email}&passwordFromFront=${password}`;
-    let bodyWithId = `emailFromFront=${email}&passwordFromFront=${password}&cleanwalkIdFromFront=${props.cwIdInvited}`;
+    let bodyWithoutID = `token=${props.tokenObj.token}&emailFromFront=${email}&passwordFromFront=${password}`;
+    let bodyWithId = `token=${props.tokenObj.token}&emailFromFront=${email}&passwordFromFront=${password}&cleanwalkIdFromFront=${props.cwIdInvited}`;
     let finalBody;
 
     if (props.cwIdInvited == null) {
