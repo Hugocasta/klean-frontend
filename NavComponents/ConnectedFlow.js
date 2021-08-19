@@ -25,7 +25,6 @@ import { colors } from '../lib/colors';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-
 export default function ConnectedFlow() {
   return (
     <Tab.Navigator
@@ -94,27 +93,27 @@ function ConnectedMapStack() {
         ],
         routes: [
           {
-            key: "Chercher-LnoZY_eAc_zltdO06qMeR",
+            key: navigation.dangerouslyGetState().routes[0].key,
             name: "Chercher",
             params: undefined,
           },
           {
-            key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
+            key: navigation.dangerouslyGetState().routes[1].key,
             name: "Classement",
             params: undefined,
           },
           {
-            key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
+            key: navigation.dangerouslyGetState().routes[2].key,
             name: "Proposer",
             params: undefined,
           },
           {
-            key: "Profil-jl_XJIfAXXulX3ykpEn8E",
+            key: navigation.dangerouslyGetState().routes[3].key,
             name: "Profil",
             params: undefined,
           },
           {
-            key: "Actualité-agTpC7a_x3lxQN469zmsP",
+            key: navigation.dangerouslyGetState().routes[4].key,
             name: "Actualité",
             params: undefined,
           },
@@ -160,27 +159,27 @@ function CreateEventStack() {
         ],
         routes: [
           {
-            key: "Chercher-LnoZY_eAc_zltdO06qMeR",
+            key: navigation.dangerouslyGetState().routes[0].key,
             name: "Chercher",
             params: undefined,
           },
           {
-            key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
+            key: navigation.dangerouslyGetState().routes[1].key,
             name: "Classement",
             params: undefined,
           },
           {
-            key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
+            key: navigation.dangerouslyGetState().routes[2].key,
             name: "Proposer",
             params: undefined,
           },
           {
-            key: "Profil-jl_XJIfAXXulX3ykpEn8E",
+            key: navigation.dangerouslyGetState().routes[3].key,
             name: "Profil",
             params: undefined,
           },
           {
-            key: "Actualité-agTpC7a_x3lxQN469zmsP",
+            key: navigation.dangerouslyGetState().routes[4].key,
             name: "Actualité",
             params: undefined,
           },
@@ -225,27 +224,32 @@ function ProfilStack() {
         ],
         routes: [
           {
-            key: "Chercher-LnoZY_eAc_zltdO06qMeR",
+            //key: "Chercher-LnoZY_eAc_zltdO06qMeR",
+            key: navigation.dangerouslyGetState().routes[0].key,
             name: "Chercher",
             params: undefined,
           },
           {
-            key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
+            //key: "Classement-DtdmTG0KQ7IYaQIxvD0bE",
+            key: navigation.dangerouslyGetState().routes[1].key,
             name: "Classement",
             params: undefined,
           },
           {
-            key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
+            //key: "Proposer-vuxpJBUjLDuEMFN5Lg7Zc",
+            key: navigation.dangerouslyGetState().routes[2].key,
             name: "Proposer",
             params: undefined,
           },
           {
-            key: "Profil-jl_XJIfAXXulX3ykpEn8E",
+            //key: "Profil-jl_XJIfAXXulX3ykpEn8E",
+            key: navigation.dangerouslyGetState().routes[3].key,
             name: "Profil",
             params: undefined,
           },
           {
-            key: "Actualité-agTpC7a_x3lxQN469zmsP",
+            //key: "Actualité-agTpC7a_x3lxQN469zmsP",
+            key: navigation.dangerouslyGetState().routes[4].key,
             name: "Actualité",
             params: undefined,
           },

@@ -34,12 +34,12 @@ function ChatProfilStack(props) {
             }
         };
         
-        if (isFocused) {
+        if (isFocused && loadInterval === undefined) {
             setLoadInterval(setInterval(loadData, 5000));
-        } else {
+        }  else {
             clearInterval(loadInterval)
-        }
-        return () => { clearInterval(loadInterval) }
+        } 
+       return () => { clearInterval(loadInterval) }
     }, [isFocused]);
 
     const sendMessage = async (message) => {
